@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css" rel="stylesheet">
+  <title>Simple Payments</title>
+
+  <style>
+    #main-loader {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: white;
+      position: fixed;
+      z-index: 999;
+      height: 100%;
+      width: 100%;
+      top: 0;
+      left: 0;
+    }
+  </style>
+
+</head>
+
+<body>
+  <div id="main-loader">
+    <div class="loading-logo">
+      <img width="50" height="50" src="/src/assets/images/loader.png" alt="Logo" />
+    </div>
+  </div>
+  <div id="app"></div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
+</html>
