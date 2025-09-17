@@ -10,7 +10,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class ProcessSinglePayment implements ShouldQueue
+class ProcessPaymentChunkJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -19,11 +19,11 @@ class ProcessSinglePayment implements ShouldQueue
     public function handle(): void
     {
         $pdo = DB::connection()->getPdo();
-        $data = $this->validPayments; // one chunk
+        $data = $this->validPayments;
 
         if (! empty($data)) {
 
-            // Columns must match your DB fields
+            // Columns
             $columns = [
                 'customer_id',
                 'customer_name',
@@ -44,10 +44,10 @@ class ProcessSinglePayment implements ShouldQueue
                 // Validate date
                 $validDate = \DateTime::createFromFormat('Y-m-d H:i:s', $date);
                 if ($validDate && $validDate->format('Y-m-d H:i:s') === $date) {
-                    $filtered[] = $row; // keep only valid rows
+                    $filtered[] = $row; // valid rows
                 } else {
-                    // Optionally log invalid rows
-                    Log::warning('Skipping invalid date row', $row);
+
+                    Log::warning('Row is invalid : skipping', $row);
                 }
             }
 
@@ -55,7 +55,7 @@ class ProcessSinglePayment implements ShouldQueue
                 return; // nothing to insert
             }
 
-            // Build placeholders
+            // construct placeholders
             $placeholders = rtrim(
                 str_repeat('('.rtrim(str_repeat('?,', count($columns)), ',').'),', count($filtered)),
                 ','
@@ -63,7 +63,7 @@ class ProcessSinglePayment implements ShouldQueue
 
             $sql = 'INSERT INTO payments ('.implode(',', $columns).') VALUES '.$placeholders;
 
-            // Flatten values
+            // Flatt the values
             $values = [];
             foreach ($filtered as $row) {
                 foreach ($columns as $col) {
@@ -71,6 +71,7 @@ class ProcessSinglePayment implements ShouldQueue
                 }
             }
 
+            // Run the statement
             $pdo->prepare($sql)->execute($values);
         }
     }

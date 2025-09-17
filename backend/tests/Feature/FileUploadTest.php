@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Jobs\ProcessTransactionJob;
+use App\Jobs\ProcessPaymentFileJob;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -32,7 +32,7 @@ class FileUploadTest extends TestCase
 
         $response = $this->actingAs($this->user)->postJson('api/upload', ['file' => $file]);
 
-        Bus::assertDispatched(ProcessTransactionJob::class);
+        Bus::assertDispatched(ProcessPaymentFileJob::class);
 
         $response->assertNoContent();
     }

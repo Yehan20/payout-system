@@ -29,12 +29,8 @@ class DailyPayOutJob implements ShouldQueue
                 $grouped = $payments->groupBy('customer_email');
 
                 foreach ($grouped as $email => $records) {
-                    SendInvoiceJob::dispatchSync($email, $records);
-
-                    return false;
-
+                    SendInvoiceJob::dispatch($email, $records)->onQueue('emails');
                 }
             });
-
     }
 }

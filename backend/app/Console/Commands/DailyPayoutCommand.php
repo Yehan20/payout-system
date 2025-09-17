@@ -12,14 +12,14 @@ class DailyPayoutCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'payout:now';
+    protected $signature = 'daily:payout';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Send Invoices to customers';
 
     /**
      * Execute the console command.
