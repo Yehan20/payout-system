@@ -25,7 +25,7 @@ class SendInvoiceJob implements ShouldQueue
 
         $data = [
             'payments' => $this->payments->toArray(),
-            'totalUsd' => $this->payments->sum('usd_amount'),
+            'totalUsd' => $this->payments->sum('amount_usd'),
         ];
         // dd($data);
 

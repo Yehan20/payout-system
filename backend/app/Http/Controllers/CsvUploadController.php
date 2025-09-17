@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CsvRequest;
-use App\Jobs\ProcessTransactionJob;
+use App\Jobs\ProcessPaymentFileJob;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
@@ -15,11 +16,9 @@ class CsvUploadController extends Controller
     public function store(CsvRequest $request): Response
     {
 
-        if (! $request->hasFile('file')) {
-            throw new NotFoundHttpException;
-        }
         $file = $request->file('file');
 
+        // If this exist
         if (Storage::exists('my_csvs/payments.csv')) {
             throw new ConflictHttpException('Resource already exists.');
         }
@@ -32,23 +31,23 @@ class CsvUploadController extends Controller
             's3'
         );
 
-        ProcessTransactionJob::dispatch($path);
+        ProcessPaymentFileJob::dispatch($path);
 
         return response()->noContent();
     }
 
-    public function show(Request $request)
+    public function show(Request $request): JsonResponse
     {
 
-        // Can be used to start proccessing
+        // Can be used to start proccessing if needed
         if (! Storage::exists('my_csvs/payments.csv')) {
             throw new NotFoundHttpException;
         }
 
-        ProcessTransactionJob::dispatch('my_csvs/payments.csv');
+        ProcessPaymentFileJob::dispatch('my_csvs/payments.csv');
 
         return response()->json([
-            'message' => 'Processing began',
+            'message' => 'Processing begun',
         ], 200);
     }
 }

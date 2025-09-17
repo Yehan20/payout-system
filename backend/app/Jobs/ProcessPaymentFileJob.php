@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Spatie\SimpleExcel\SimpleExcelReader;
 
-class ProcessTransactionJob implements ShouldQueue
+class ProcessPaymentFileJob implements ShouldQueue
 {
     use Queueable;
 
@@ -26,11 +26,11 @@ class ProcessTransactionJob implements ShouldQueue
     public function handle(ExchangeRateService $service): void
     {
         //  Fetching the file if exists cancel
-        if (! Storage::disk('public')->exists($this->path)) {
+        if (! Storage::disk('s3')->exists($this->path)) {
 
             throw new \Exception('File does not exist');
         }
-        $fullPath = Storage::disk('public')->path($this->path);
+        $fullPath = Storage::disk('s3')->path($this->path);
 
         // Create the strean
         $rows = SimpleExcelReader::create($fullPath)->getRows();
@@ -63,7 +63,7 @@ class ProcessTransactionJob implements ShouldQueue
                 // When the chunk becoms 1000 or greater dispatch this job
                 if (count($validPayments) >= $chunkLimit) {
 
-                    ProcessSinglePayment::dispatch($validPayments)->onQueue('payments');
+                    ProcessPaymentChunkJob::dispatch($validPayments)->onQueue('payments');
 
                     $validPayments = [];
                 }
@@ -71,7 +71,7 @@ class ProcessTransactionJob implements ShouldQueue
         );
 
         if (count($validPayments)) {
-            ProcessSinglePayment::dispatch($validPayments)->onQueue('payments');
+            ProcessPaymentChunkJob::dispatch($validPayments)->onQueue('payments');
         }
     }
 }

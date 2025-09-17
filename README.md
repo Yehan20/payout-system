@@ -1,12 +1,7 @@
-# Payout System
+# Simple Payments
 
 ## Project Description
 Automate payment completion
-
-You can use the following test user to log in:
-
-- **Email:** `admin@test.com`
-- **Password:** `password`
 
 ## Features
 - User Authentication
@@ -18,7 +13,7 @@ You can use the following test user to log in:
 ## Technology Stack
 - Backend: Laravel (12)
 - Frontend: Vue JS with TypeScript
-- State management: Context Api
+- State management: Pinia
 - Storage: AWS 
 - UI Framework: Vuetify
 
@@ -112,13 +107,13 @@ git remote add origin https://github.com/<your-github-username>/<your-repo-name>
 
 ### Exchange Rate API Setup
 
-To get currency conversion rates for transactions, this project uses the [ExchangeRate.host](https://api.exchangerate.host/latest) API.
+To get currency conversion rates for transactions, this project uses the [ExchangeRate.host](https://api.exchangerate.host/latest) you can get your epi key here and then add it to the env file .
 
 #### Steps to Configure
 
 ####  Api intergration to recive contry status code and payment reats
 1. **Get an API Key**  
-   - ExchangeRate.host is free and doesn’t strictly require an API key.  
+   - EXCHANGE_RATE_KEY=yourkey.  
 
 ###  Aws Configuration
 
@@ -149,6 +144,7 @@ AWS_USE_PATH_STYLE_ENDPOINT=false
 - If you are **not using AWS S3** and want to store files locally:
   1. Open `config/filesystems.php`.
   2. Change the default disk from `s3` to `public`:
+  3. Change the test disk and the places that uses the s3 disk
 
   ```php
   'default' => env('FILESYSTEM_DRIVER', 'public'),
@@ -163,7 +159,7 @@ Laravel uses queue workers to process jobs asynchronously, such as sending email
 |------------|------------|
 | Default    | default    |
 | Payments   | payments   |
-| Email      | email      |
+| Email      | emails     |
 
 #### Starting the Workers
 
@@ -174,6 +170,15 @@ php artisan queue:work --queue=default
 php artisan queue:work --queue=payments
 php artisan queue:work --queue=email
 ```
+#### To process  smoothly and with minimal errors, youcan  run separate queue workers for each queue
+
+```bash
+php artisan queue:work --queue=payments --tries=3 --timeout=300
+php artisan queue:work --queue=emails --tries=3 --timeout=300
+php artisan queue:work --tries=3 --timeout=300
+```
+
+
 
 ### Email Server Configuration 
 
@@ -233,10 +238,10 @@ You will need **6 terminals** in total:
 
 ### Frontend Setup
 
-1. Navigate to frontend folder:
+1. Navigate to client folder:
 
    ```bash
-   cd frontend
+   cd client
    ```
 
 2. Copy environment config:
@@ -295,8 +300,7 @@ cd backend
 php artisan test
 ```
 
->  **Note:**  
-> If you change the test runner's origin (e.g., running the frontend on a different port), be sure to update the `allowed_origins` setting in your Laravel `config/cors.php` file:
+
 
 
 ## Main API Endpoints

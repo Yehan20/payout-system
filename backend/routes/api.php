@@ -12,5 +12,3 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
     Route::get('payments', [PaymentController::class, 'index']);
     Route::get('process', [CsvUploadController::class, 'show']);
 });
-
-// Route::get('mail', [CsvUploadController::class, 'email']);

@@ -19,7 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withSchedule(function (Schedule $schedule): void {
-        //  $schedule->call('proccess:payments')->dailyAt('23:59');
+
         $schedule->job(new DailyPayOutJob)->dailyAt('23:59');
     })
     ->withMiddleware(function (Middleware $middleware): void {
